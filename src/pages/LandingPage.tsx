@@ -5,12 +5,18 @@
 
 
 import HeroSection from '@/layouts/herosection'
+import Carousel from '@/layouts/carousel'
 
 export function LandingPage() {
   return (
-    <div className="min-h-section bg-white">
-      <HeroSection/>
-    </div>
+    <>
+      <div className="min-h-section bg-white">
+        <HeroSection />
+      </div>
+      <div className="min-h-section bg-beige">
+        <Carousel />
+      </div>
+    </>
   );
 }
 
