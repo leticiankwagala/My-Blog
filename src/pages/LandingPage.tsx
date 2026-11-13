@@ -5,7 +5,8 @@
 
 
 import HeroSection from '@/layouts/herosection'
-import Carousel from '@/layouts/carousel'
+import { CarouselSection } from "@/layouts/carousel";
+
 
 export function LandingPage() {
   return (
@@ -14,7 +15,7 @@ export function LandingPage() {
         <HeroSection />
       </div>
       <div className="min-h-section bg-beige">
-        <Carousel />
+        <CarouselSection />
       </div>
     </>
   );
