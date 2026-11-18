@@ -13,10 +13,12 @@ import { PATHS, type AppPath } from './paths'
 
 interface NavigateOptions {
   replace?: boolean
+  search?: string
 }
 
 interface RouterContextValue {
   pathname: string
+  search: string
   navigate: (to: AppPath, options?: NavigateOptions) => void
 }
 
@@ -28,13 +30,18 @@ function normalizePath(rawPath: string): string {
 }
 
 export function RouterProvider({ children }: { children: ReactNode }) {
-  const [pathname, setPathname] = useState<string>(() =>
-    typeof window !== 'undefined' ? normalizePath(window.location.pathname) : PATHS.LANDING,
-  )
+  const [location, setLocation] = useState(() => ({
+    pathname:
+      typeof window !== 'undefined' ? normalizePath(window.location.pathname) : PATHS.LANDING,
+    search: typeof window !== 'undefined' ? window.location.search : '',
+  }))
 
   useEffect(() => {
     const handlePopState = () => {
-      setPathname(normalizePath(window.location.pathname))
+      setLocation({
+        pathname: normalizePath(window.location.pathname),
+        search: window.location.search,
+      })
     }
 
     window.addEventListener('popstate', handlePopState)
@@ -43,18 +50,26 @@ export function RouterProvider({ children }: { children: ReactNode }) {
 
   const navigate = useCallback((to: AppPath, options?: NavigateOptions) => {
     const normalizedTarget = normalizePath(to)
-    if (window.location.pathname !== normalizedTarget) {
+    const search = options?.search ? (options.search.startsWith('?') ? options.search : `?${options.search}`) : ''
+    const targetUrl = `${normalizedTarget}${search}`
+    const currentUrl = `${window.location.pathname}${window.location.search}`
+
+    if (currentUrl !== targetUrl) {
       if (options?.replace) {
-        window.history.replaceState({}, '', normalizedTarget)
+        window.history.replaceState({}, '', targetUrl)
       } else {
-        window.history.pushState({}, '', normalizedTarget)
+        window.history.pushState({}, '', targetUrl)
       }
     }
-    setPathname(normalizedTarget)
+
+    setLocation({ pathname: normalizedTarget, search })
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
-  const value = useMemo(() => ({ pathname, navigate }), [pathname, navigate])
+  const value = useMemo(
+    () => ({ ...location, navigate }),
+    [location, navigate],
+  )
 
   return <RouterContext.Provider value={value}>{children}</RouterContext.Provider>
 }
@@ -64,7 +79,7 @@ export function useLocation() {
   if (!context) {
     throw new Error('useLocation must be used within a RouterProvider')
   }
-  return { pathname: context.pathname }
+  return { pathname: context.pathname, search: context.search }
 }
 
 export function useNavigate() {

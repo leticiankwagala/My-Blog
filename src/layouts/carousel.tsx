@@ -3,56 +3,13 @@
 import { useState } from "react";
 import { MoveLeft, MoveRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-
-interface BlogPost {
-    id: string;
-    category: string;
-    badgeType?: "paid" | "free";
-    badgeText?: string;
-    date: string;
-    readTime: string;
-    title: string;
-    excerpt: string;
-    image: string;
-}
-
-const BLOG_POSTS: BlogPost[] = [
-    {
-        id: "1",
-        category: "Architecture",
-        badgeType: "paid",
-        badgeText: "Paid - UGX 10,000",
-        date: "Oct 24, 2026",
-        readTime: "8 min read",
-        title: "From code camps to building real websites that ship.",
-        excerpt: "Honest lessons from learning software development, pushing projects to Vercel and figuring out what it takes to build a solid portfolio.",
-        image: "public/codesamp.jpg",
-    },
-    {
-        id: "2",
-        category: "Technology",
-        badgeType: "free",
-        badgeText: "Free",
-        date: "Nov 02, 2026",
-        readTime: "5 min read",
-        title: "What working at a health centre taught me about real-world data.",
-        excerpt: "Moving past basic coding tutorials and looking at how keeping digital records and patient info organized actually helps day-to-day operations.",
-        image: "public/health.jpg",
-    },
-    {
-        id: "3",
-        category: "Architecture",
-        badgeType: "paid",
-        badgeText: "Paid - UGX 5,000",
-        date: "Nov 14, 2026",
-        readTime: "12 min read",
-        title: "Automating my workflow: How I use Zapier and Google tools to save time.",
-        excerpt: "Simple ways to connect your apps, handle emails automatically and stop doing repetitive manual tasks.",
-        image: "public/zapier.jpg",
-    },
-];
+import { Button } from "@base-ui/react/button";
+import { useNavigate } from "../navigation/RouterContext";
+import { PATHS } from "../navigation/paths";
+import { BLOG_POSTS } from "@/lib/posts";
 
 export function CarouselSection() {
+    const navigate = useNavigate();
     const [activeCategory, setActiveCategory] = useState("All");
 
     return (
@@ -77,8 +34,8 @@ export function CarouselSection() {
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
                                 className={`px-3.5 py-1.5 rounded-full transition-colors ${activeCategory === cat
-                                        ? "bg-white text-neutral-900 shadow-sm"
-                                        : "hover:text-neutral-900"
+                                    ? "bg-white text-neutral-900 shadow-sm"
+                                    : "hover:text-neutral-900"
                                     }`}
                             >
                                 {cat}
@@ -123,11 +80,12 @@ export function CarouselSection() {
                 {BLOG_POSTS.map((post) => (
                     <article
                         key={post.id}
+                        onClick={() => navigate(PATHS.BLOG_DETAILS, { search: `?id=${post.id}` })}
                         className="group bg-white border border-neutral-200 rounded-2xl overflow-hidden flex flex-col transition-all hover:border-neutral-300"
                     >
                         <div className="relative aspect-[16/10] overflow-hidden bg-neutral-100">
                             <img
-                                src={post.image}
+                                src={post.imageUrl}
                                 alt={post.title}
                                 className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                             />
@@ -135,9 +93,9 @@ export function CarouselSection() {
                         <div className="p-6 flex flex-col flex-grow">
                             <div className="flex items-center justify-between text-xs text-neutral-500 mb-3">
                                 <span className="font-medium text-neutral-800">{post.category}</span>
-                                {post.badgeText && (
+                                {post.badgeLabel && (
                                     <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200">
-                                        {post.badgeText}
+                                        {post.badgeLabel}
                                     </span>
                                 )}
                             </div>
@@ -152,12 +110,12 @@ export function CarouselSection() {
                                 {post.excerpt}
                             </p>
                             <div className="mt-auto pt-4 border-t border-neutral-100">
-                                <a
-                                    href="#"
+                                <Button
+                                    onClick={() => navigate(PATHS.BLOG_DETAILS, { search: `?id=${post.id}` })}
                                     className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-neutral-900 hover:underline"
                                 >
-                                    Read →
-                                </a>
+                                    Read <MoveRight className="ml-1 h-3 w-3" />
+                                </Button>
                             </div>
                         </div>
                     </article>
