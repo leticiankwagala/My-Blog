@@ -116,6 +116,8 @@ pnpm run dev:backend
 ```
 This command will prompt you to log in to Convex, link or create a project, generate files in `convex/_generated/`, and automatically write `VITE_CONVEX_URL` to `.env.local`.
 
+For production hosting, add `VITE_CONVEX_URL` to the host's build-time environment variables using the URL of the deployed Convex backend, then trigger a new build. Vite embeds `VITE_*` variables during the build, so changing the host setting requires rebuilding the frontend.
+
 ### Step 3: Start the Application
 Once dependencies are installed, start both the Vite frontend server and the Convex backend watcher in parallel:
 ```bash
