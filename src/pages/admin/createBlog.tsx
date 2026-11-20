@@ -570,9 +570,8 @@ export function CreateBlogPage() {
                     <FormTextInput
                         label="Blog Title"
                         required
-                        placeholder="e.g. Distributed Consensus in Equatorial Topographies"
+                        placeholder="Connecting at social events."
                         counter={{ current: watchedTitle.length, max: MAX_TITLE_LENGTH }}
-                        hint="A concise, definitive title set in our editorial headline style."
                         error={errors.title?.message}
                         containerClassName="mt-6"
                         className="h-12 font-serif text-lg"
@@ -583,12 +582,11 @@ export function CreateBlogPage() {
                         label="Subtitle"
                         required
                         rows={3}
-                        placeholder="Summarize the core thesis, fieldwork constraints, or architectural implications in one or two deliberate sentences..."
+                        placeholder="Simple ways to strike up conversations stay present and build real friendships and opportunities outside formal settings "
                         counter={{
                             current: watchedSubtitle.length,
                             max: MAX_SUBTITLE_LENGTH,
                         }}
-                        hint="Displays directly beneath the cover art on the reader dispatch feed."
                         error={errors.subtitle?.message}
                         containerClassName="mt-6"
                         className="text-xs leading-relaxed"
@@ -602,7 +600,6 @@ export function CreateBlogPage() {
                             placeholder="e.g. Web Dev & Design, Longevity, Distributed Systems"
                             leadingIcon={<Tag aria-hidden="true" className="size-3.5" />}
                             rightLabel={`${parsedTags.length} ${parsedTags.length === 1 ? 'tag' : 'tags'}`}
-                            hint="Separate multiple archival tags with commas. The first tag appears as the primary dispatch badge."
                             error={errors.tagsInput?.message}
                             className="text-xs"
                             {...register('tagsInput')}

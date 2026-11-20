@@ -93,9 +93,10 @@ export function useNavigate() {
 export interface LinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
   to: AppPath
   replace?: boolean
+  search?: string
 }
 
-export function Link({ to, replace, onClick, children, ...rest }: LinkProps) {
+export function Link({ to, replace, search, onClick, children, ...rest }: LinkProps) {
   const navigate = useNavigate()
 
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -111,11 +112,15 @@ export function Link({ to, replace, onClick, children, ...rest }: LinkProps) {
       return
     }
     event.preventDefault()
-    navigate(to, { replace })
+    navigate(to, { replace, search })
   }
 
+  const href = search
+    ? `${to}${search.startsWith('?') ? search : `?${search}`}`
+    : to
+
   return (
-    <a href={to} onClick={handleClick} {...rest}>
+    <a href={href} onClick={handleClick} {...rest}>
       {children}
     </a>
   )
