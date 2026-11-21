@@ -98,7 +98,7 @@ export const getByIdOrSlug = query({
     handler: async (ctx, args) => {
         const blogBySlug = await ctx.db
             .query("blogs")
-            .withIndex("by_slug", (q) => q.eq("slug", args.identifier))
+            .withIndex("by_status", (q) => q.eq("status", "published"))
             .unique();
         const blog = blogBySlug ?? await ctx.db.get(args.identifier as Id<"blogs">);
         if (!blog) return null;
@@ -157,12 +157,65 @@ export const listBlogs = query({
     },
 });
 
+export const listPublishedBlogs = query({
+    args: {},
+    handler: async (ctx) => {
+        const blogs = await ctx.db
+            .query("blogs")
+            .withIndex("by_status", (q) => q.eq("status", "published"))
+            .order("desc")
+            .take(12);
+
+        return blogs.map((blog) => ({
+            _id: blog._id,
+            _creationTime: blog._creationTime,
+            title: blog.title,
+            subtitle: blog.subtitle,
+            excerpt: blog.excerpt,
+            category: blog.category,
+            badgeLabel: blog.badgeLabel,
+            readTime: blog.readTime,
+            subscriptionMode: blog.subscriptionMode,
+            price: blog.price,
+            coverImageUrl: blog.coverImageUrl,
+            coverImageData: blog.coverImageData,
+        }));
+    },
+});
+
+export const getPublishedBlog = query({
+    args: { identifier: v.string() },
+    handler: async (ctx, args) => {
+        const blogId = ctx.db.normalizeId("blogs", args.identifier);
+        if (!blogId) return null;
+
+        const blog = await ctx.db.get(blogId);
+        if (!blog || blog.status !== "published") return null;
+
+        return {
+            _id: blog._id,
+            _creationTime: blog._creationTime,
+            title: blog.title,
+            subtitle: blog.subtitle,
+            excerpt: blog.excerpt,
+            category: blog.category,
+            readTime: blog.readTime,
+            subscriptionMode: blog.subscriptionMode,
+            price: blog.price,
+            coverImageUrl: blog.coverImageUrl,
+            coverImageData: blog.coverImageData,
+            previewContentHtml: blog.previewContentHtml,
+            author: blog.author,
+        };
+    },
+});
+
 export const getBlogBySlug = query({
     args: { slug: v.string() },
     handler: async (ctx, args) => {
         return await ctx.db
             .query("blogs")
-            .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+            .withIndex("by_status", (q) => q.eq("status", "published"))
             .unique();
     },
 });

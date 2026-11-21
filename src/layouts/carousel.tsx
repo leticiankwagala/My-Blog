@@ -1,16 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useQuery } from "convex/react";
 import { MoveLeft, MoveRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Button } from "@base-ui/react/button";
 import { useNavigate } from "../navigation/RouterContext";
 import { PATHS } from "../navigation/paths";
-import { BLOG_POSTS } from "@/lib/posts";
+import { api } from "../../convex/_generated/api";
 
 export function CarouselSection() {
     const navigate = useNavigate();
     const [activeCategory, setActiveCategory] = useState("All");
+    const blogs = useQuery(api.blog.listPublishedBlogs);
+    const visibleBlogs = (blogs ?? []).filter(
+        (blog) => activeCategory === "All" || blog.category === activeCategory,
+    );
 
     return (
         <section className="max-w-7xl mx-auto px-6 py-16">
@@ -77,41 +82,66 @@ export function CarouselSection() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {BLOG_POSTS.map((post) => (
+                {blogs === undefined ? (
+                    <p className="col-span-full py-10 text-center text-sm text-neutral-500" role="status">
+                        Loading recent blogs...
+                    </p>
+                ) : visibleBlogs.length === 0 ? (
+                    <p className="col-span-full py-10 text-center text-sm text-neutral-500">
+                        {activeCategory === "All"
+                            ? "No published blogs yet."
+                            : "No published blogs in this category yet."}
+                    </p>
+                ) : visibleBlogs.map((post) => (
                     <article
-                        key={post.id}
-                        onClick={() => navigate(PATHS.BLOG_DETAILS, { search: `?id=${post.id}` })}
+                        key={post._id}
+                        onClick={() => navigate(PATHS.BLOG_DETAILS, { search: `?id=${post._id}` })}
                         className="group bg-white border border-neutral-200 rounded-2xl overflow-hidden flex flex-col transition-all hover:border-neutral-300"
                     >
                         <div className="relative aspect-[16/10] overflow-hidden bg-neutral-100">
-                            <img
-                                src={post.imageUrl}
-                                alt={post.title}
-                                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-                            />
+                            {post.coverImageUrl ? (
+                                <img
+                                    src={post.coverImageUrl}
+                                    alt={post.coverImageData.alt}
+                                    className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                                />
+                            ) : (
+                                <div className="flex h-full items-center justify-center text-sm text-neutral-400">
+                                    No cover image
+                                </div>
+                            )}
                         </div>
                         <div className="p-6 flex flex-col flex-grow">
                             <div className="flex items-center justify-between text-xs text-neutral-500 mb-3">
                                 <span className="font-medium text-neutral-800">{post.category}</span>
-                                {post.badgeLabel && (
-                                    <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200">
-                                        {post.badgeLabel}
-                                    </span>
-                                )}
+                                <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-neutral-100 text-neutral-600 border border-neutral-200">
+                                    {post.badgeLabel ??
+                                        (post.subscriptionMode === "paid"
+                                            ? `Paid · ${post.price.currency} ${post.price.amount.toLocaleString()}`
+                                            : "Free")}
+                                </span>
                             </div>
 
                             <div className="text-xs text-neutral-400 mb-3 font-medium">
-                                {post.date} · {post.readTime}
+                                {new Intl.DateTimeFormat("en", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                }).format(new Date(post._creationTime))}{" "}
+                                · {post.readTime}
                             </div>
                             <h3 className="text-lg font-bold text-neutral-900 group-hover:text-neutral-600 transition-colors mb-2 leading-snug">
                                 {post.title}
                             </h3>
                             <p className="text-sm text-neutral-600 mb-6 line-clamp-2">
-                                {post.excerpt}
+                                {post.excerpt || post.subtitle}
                             </p>
                             <div className="mt-auto pt-4 border-t border-neutral-100">
                                 <Button
-                                    onClick={() => navigate(PATHS.BLOG_DETAILS, { search: `?id=${post.id}` })}
+                                    onClick={(event) => {
+                                        event.stopPropagation();
+                                        navigate(PATHS.BLOG_DETAILS, { search: `?id=${post._id}` });
+                                    }}
                                     className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-neutral-900 hover:underline"
                                 >
                                     Read <MoveRight className="ml-1 h-3 w-3" />

@@ -47,5 +47,5 @@ export default defineSchema({
       })
     ),
     updatedAt: v.number(),
-  }).index("by_slug", ["slug"]),
+  }).index("by_status", ["status"]),
 });
