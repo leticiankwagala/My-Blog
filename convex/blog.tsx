@@ -212,7 +212,7 @@ export const getPublishedBlog = query({
 
 export const getBlogBySlug = query({
     args: { slug: v.string() },
-    handler: async (ctx, args) => {
+    handler: async (ctx) => {
         return await ctx.db
             .query("blogs")
             .withIndex("by_status", (q) => q.eq("status", "published"))
