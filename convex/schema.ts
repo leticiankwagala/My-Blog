@@ -4,11 +4,30 @@ import { v } from "convex/values";
 export const blogCategoryValidator = v.union(
   v.literal("Web Dev & Design"),
   v.literal("Operations & Data"),
-  v.literal("Career & Learning")
+  v.literal("Career & Learning"),
 );
 
-export const blogStatusValidator = v.union(v.literal("draft"), v.literal("published"));
-export const subscriptionModeValidator = v.union(v.literal("free"), v.literal("paid"));
+export const blogStatusValidator = v.union(
+  v.literal("draft"),
+  v.literal("published"),
+);
+
+export const subscriptionModeValidator = v.union(
+  v.literal("free"),
+  v.literal("paid"),
+);
+
+export const currencyValidator = v.union(
+  v.literal("UGX"),
+  v.literal("ITX"),
+);
+
+export const transactionStatusValidator = v.union(
+  v.literal("pending"),
+  v.literal("processing"),
+  v.literal("completed"),
+  v.literal("failed"),
+);
 
 export default defineSchema({
   blogs: defineTable({
@@ -44,8 +63,23 @@ export default defineSchema({
         id: v.string(),
         name: v.string(),
         role: v.string(),
-      })
+      }),
     ),
     updatedAt: v.number(),
   }).index("by_status", ["status"]),
+
+  transactions: defineTable({
+    blogId: v.id("blogs"),
+    amount: v.number(),
+    currency: currencyValidator,
+    payerEmail: v.string(),
+    payerPhoneNumber: v.string(),
+    transactionType: v.literal("subscription"),
+    status: transactionStatusValidator,
+    statusMessage: v.optional(v.string()),
+    externalId: v.optional(v.string()),
+  }).index(
+    "by_blogId_and_payerEmail_and_status_and_transactionType",
+    ["blogId", "payerEmail", "status", "transactionType"],
+  ),
 });
