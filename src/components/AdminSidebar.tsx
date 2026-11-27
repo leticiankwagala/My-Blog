@@ -7,7 +7,7 @@ export function AdminSidebar() {
   const navigate = useNavigate()
 
   return (
-    <aside className="sticky top-0 flex h-dvh w-60 shrink-0 flex-col justify-between border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
+    <aside className="sticky top-0 flex h-dvh w-44 shrink-0 flex-col justify-between border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
       <div>
         <div className="px-5 pt-6 pb-5">
           <Link
@@ -35,7 +35,7 @@ export function AdminSidebar() {
                     className={({ isActive }) =>
                       `flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sidebar-ring ${
                         isActive
-                          ? 'bg-sidebar-primary font-medium text-sidebar-primary-foreground shadow-2xs'
+                          ? 'bg-[#db2777] font-medium text-white shadow-2xs'
                           : 'font-medium text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                       }`
                     }
